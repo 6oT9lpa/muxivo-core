@@ -40,6 +40,11 @@ def test_media_contract_accepts_strict_synchronized_payload() -> None:
     assert request.attachments[0].to_domain().download_url is not None
 
 
+def test_media_contract_accepts_discord_cdn_link_without_declared_size() -> None:
+    attachment = _attachment().model_copy(update={"file_size": None})
+    assert attachment.to_domain().file_size is None
+
+
 def test_media_contract_accepts_missing_optional_discord_content_type() -> None:
     attachment = MediaAttachmentRequestSchema(
         attachment_id="5",

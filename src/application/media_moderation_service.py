@@ -281,7 +281,7 @@ class MediaModerationService:
 
     def _validate_attachment_hint(self, attachment: MediaAttachment) -> None:
         """Contain invalid metadata to this attachment instead of rejecting its message."""
-        if attachment.file_size > self._runtime_config.max_file_size_bytes:
+        if attachment.file_size is not None and attachment.file_size > self._runtime_config.max_file_size_bytes:
             raise MediaValidationError("declared media size exceeds per-file limit")
         if attachment.width is not None and attachment.width > self._runtime_config.max_width:
             raise MediaValidationError("declared media width exceeds limit")
@@ -499,7 +499,8 @@ class MediaModerationService:
                         ),
                         detected_mime=analysis.detected_mime,
                         file_size=analysis.actual_file_size
-                        or analysis.attachment.file_size,
+                        or analysis.attachment.file_size
+                        or 0,
                         width=analysis.width,
                         height=analysis.height,
                         hashes=analysis.hashes,

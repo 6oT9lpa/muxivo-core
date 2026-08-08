@@ -9,7 +9,7 @@ class MediaAttachment(BaseModel):
     media_reference: str | None = Field(default=None, min_length=1, max_length=512)
     file_name: str | None = Field(default=None, max_length=255)
     content_type: str | None = Field(default=None, max_length=127)
-    file_size: int = Field(gt=0)
+    file_size: int | None = Field(default=None, gt=0)
     width: int | None = Field(default=None, gt=0)
     height: int | None = Field(default=None, gt=0)
 

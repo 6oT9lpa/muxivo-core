@@ -12,7 +12,9 @@ class MediaAttachmentRequestSchema(ApiModel):
     # Discord documents this field as optional. The downloaded bytes decide the
     # actual format; this value is retained as an untrusted transport hint.
     content_type: str | None = Field(default=None, max_length=127, pattern=r"^[A-Za-z0-9!#$&^_.+-]+/[A-Za-z0-9!#$&^_.+-]+$")
-    file_size: int = Field(gt=0, le=104_857_600)
+    # Direct Discord CDN links do not expose attachment metadata. The bounded
+    # downloader and byte validator remain the source of truth in that case.
+    file_size: int | None = Field(default=None, gt=0, le=104_857_600)
     width: int | None = Field(default=None, gt=0, le=100_000)
     height: int | None = Field(default=None, gt=0, le=100_000)
 
