@@ -121,6 +121,25 @@ async def test_dataset_collector_does_not_store_raw_context_metadata_or_unbounde
     assert repository.record.retention_until == context.created_at + timedelta(days=365)
 
 
+@pytest.mark.asyncio
+async def test_dataset_collector_keeps_request_lineage_inside_the_collection_record() -> None:
+    repository = InMemoryDatasetCollectorRepository()
+    collector = DatasetCollector(repository)
+    context, rule_result, decision = await _run_text_pipeline("ordinary message")
+
+    await collector.collect(
+        DatasetCollectionInput(
+            context=context,
+            rule_evaluation=rule_result,
+            decision=decision,
+            correlation_id="request-lineage-42",
+        )
+    )
+
+    assert repository.record is not None
+    assert repository.record.correlation_id == "request-lineage-42"
+
+
 async def _run_text_pipeline(text: str):
     context = await TextPreprocessor().process(
         MessagePreprocessInputSchema(

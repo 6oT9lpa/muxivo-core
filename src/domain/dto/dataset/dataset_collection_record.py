@@ -38,4 +38,5 @@ class DatasetCollectionRecord(BaseModel):
     created_at: datetime
     processed_at: datetime
     retention_until: datetime | None = None
+    correlation_id: str | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)

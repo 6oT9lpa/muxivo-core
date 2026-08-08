@@ -74,9 +74,10 @@ class PostgresqlDatasetCollectorRepository(DatasetCollectorRepository):
                 attachment_count,
                 created_at,
                 processed_at,
-                retention_until
+                retention_until,
+                correlation_id
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (guild_id, message_id) DO UPDATE SET
                 platform = EXCLUDED.platform,
                 channel_id = EXCLUDED.channel_id,
@@ -91,7 +92,8 @@ class PostgresqlDatasetCollectorRepository(DatasetCollectorRepository):
                 has_attachments = EXCLUDED.has_attachments,
                 attachment_count = EXCLUDED.attachment_count,
                 processed_at = EXCLUDED.processed_at,
-                retention_until = EXCLUDED.retention_until
+                retention_until = EXCLUDED.retention_until,
+                correlation_id = COALESCE(EXCLUDED.correlation_id, ai_message_events.correlation_id)
             RETURNING id
             """,
             [
@@ -112,6 +114,7 @@ class PostgresqlDatasetCollectorRepository(DatasetCollectorRepository):
                 record.created_at,
                 record.processed_at,
                 record.retention_until,
+                record.correlation_id,
             ],
         )
         if result.lastrowid is None:

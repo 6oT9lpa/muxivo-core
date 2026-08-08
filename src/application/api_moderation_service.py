@@ -211,12 +211,10 @@ class ApiModerationService:
                         context=context,
                         rule_evaluation=rule_evaluation,
                         decision=decision,
+                        correlation_id=correlation_id,
                     )
                 )
                 dataset_event_id = collection.event_id
-                await self._event_repository.save_request_lineage(
-                    dataset_event_id, correlation_id
-                )
             except Exception as exc:
                 logger.error(
                     "Dataset persistence failed correlation_id=%s message_id=%s",

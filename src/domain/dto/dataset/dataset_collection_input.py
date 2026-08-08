@@ -20,3 +20,4 @@ class DatasetCollectionInput(BaseModel):
     source: DatasetSource | None = None
     feedback: DatasetFeedbackLabel | None = None
     store_raw_text: bool = False
+    correlation_id: str | None = None

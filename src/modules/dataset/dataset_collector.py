@@ -63,6 +63,7 @@ class DatasetCollector:
             created_at=context.created_at,
             processed_at=datetime.now(timezone.utc),
             retention_until=self._resolve_retention_until(context),
+            correlation_id=item.correlation_id,
             metadata={
                 "dataset_text": snapshot.model_dump(mode="json"),
                 "context_metadata": self._safe_context_metadata(context.metadata),
