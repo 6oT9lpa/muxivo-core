@@ -97,3 +97,15 @@ async def test_downloader_maps_http_timeout_to_safe_error() -> None:
         await downloader.download(_attachment())
     await client.aclose()
 
+
+@pytest.mark.asyncio
+async def test_downloader_accepts_a_dedicated_socks5_proxy() -> None:
+    downloader = HttpMediaDownloader(
+        allowed_hosts=("cdn.discordapp.com",),
+        max_file_size_bytes=4,
+        timeout_seconds=1,
+        max_redirects=0,
+        proxy_url="socks5://127.0.0.1:1080",
+    )
+
+    await downloader.close()

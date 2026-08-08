@@ -97,13 +97,13 @@ class ApiSettings(BaseSettings):
             return None
         parsed = urlsplit(value)
         if (
-            parsed.scheme not in {"http", "https"}
+            parsed.scheme not in {"http", "https", "socks5"}
             or not parsed.hostname
             or parsed.path not in {"", "/"}
             or parsed.query
             or parsed.fragment
         ):
-            raise ValueError("media_proxy_url must be an HTTP(S) proxy URL")
+            raise ValueError("media_proxy_url must be an HTTP(S) or SOCKS5 proxy URL")
         return value
 
     @model_validator(mode="after")

@@ -1,0 +1,19 @@
+[Unit]
+Description=Private SOCKS5 tunnel for Discord CDN media retrieval
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ai-moder
+Group=ai-moder
+ExecStart=/usr/bin/ssh -N -D 127.0.0.1:1080 -i /opt/ai-moder/.ssh/discord_cdn_tunnel -p 21448 -o BatchMode=yes -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -o StrictHostKeyChecking=yes root@138.124.119.238
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target
