@@ -89,6 +89,7 @@ class ApiCompositionRoot:
                 max_file_size_bytes=self._settings.media_max_file_size_bytes,
                 timeout_seconds=self._settings.media_download_timeout_seconds,
                 max_redirects=self._settings.media_max_redirects,
+                proxy_url=self._settings.media_proxy_url,
             ),
             validator=PillowMediaValidator(
                 allowed_content_types=self._settings.media_allowed_content_types,

@@ -1,3 +1,5 @@
+from urllib.parse import urlsplit
+
 from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -39,6 +41,7 @@ class ApiSettings(BaseSettings):
     media_max_pixels: int = Field(default=40_000_000, ge=1, le=100_000_000)
     media_download_timeout_seconds: float = Field(default=10.0, gt=0.0, le=60.0)
     media_max_redirects: int = Field(default=2, ge=0, le=5)
+    media_proxy_url: str | None = Field(default=None, max_length=2_048)
     media_allowed_content_types: tuple[str, ...] = ("image/gif", "image/jpeg", "image/png", "image/webp")
     media_allowed_download_hosts: tuple[str, ...] = ("cdn.discordapp.com", "media.discordapp.net")
     media_retention_hours: int = Field(default=24, ge=1, le=720)
@@ -86,6 +89,22 @@ class ApiSettings(BaseSettings):
         if not normalized or any("/" in value or ":" in value for value in normalized):
             raise ValueError("media_allowed_download_hosts must contain host names")
         return normalized
+
+    @field_validator("media_proxy_url")
+    @classmethod
+    def validate_media_proxy_url(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        parsed = urlsplit(value)
+        if (
+            parsed.scheme not in {"http", "https"}
+            or not parsed.hostname
+            or parsed.path not in {"", "/"}
+            or parsed.query
+            or parsed.fragment
+        ):
+            raise ValueError("media_proxy_url must be an HTTP(S) proxy URL")
+        return value
 
     @model_validator(mode="after")
     def validate_media_dependencies(self) -> "ApiSettings":

@@ -34,6 +34,7 @@ class HttpMediaDownloader(MediaDownloader):
         max_file_size_bytes: int,
         timeout_seconds: float,
         max_redirects: int,
+        proxy_url: str | None = None,
         client: httpx.AsyncClient | None = None,
         resolver: AddressResolver | None = None,
     ) -> None:
@@ -47,6 +48,7 @@ class HttpMediaDownloader(MediaDownloader):
             timeout=httpx.Timeout(timeout_seconds, connect=min(timeout_seconds, 5.0)),
             follow_redirects=False,
             trust_env=False,
+            proxy=proxy_url,
         )
 
     async def download(self, attachment: MediaAttachment) -> DownloadedMedia:
@@ -140,4 +142,3 @@ class HttpMediaDownloader(MediaDownloader):
     async def _resolve_addresses(host: str, port: int) -> set[str]:
         records = await asyncio.to_thread(socket.getaddrinfo, host, port, type=socket.SOCK_STREAM)
         return {str(record[4][0]) for record in records}
-
