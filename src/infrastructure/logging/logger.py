@@ -42,6 +42,43 @@ class LoggerManager:
             for rotation in log_dir.glob(f"{log_file.name}.*"):
                 append_locked_logs = not self._try_unlink(rotation) or append_locked_logs
 
+        handlers: dict[str, dict[str, Any]] = {
+            "console": {
+                "class": "logging.StreamHandler",
+                "level": log_level,
+                "formatter": "default",
+                "stream": "ext://sys.stdout",
+            },
+        }
+        app_handlers = ["console"]
+        test_handlers = ["console"]
+
+        # A running process, an antivirus scanner, or a read-only working
+        # directory must not prevent the application (or its test suite) from
+        # starting.  File logs are useful, but console logging remains a safe
+        # production fallback when Windows refuses to open the log files.
+        if self._can_open_for_append(app_log_file):
+            handlers["app_file"] = {
+                "class": "logging.FileHandler",
+                "level": log_level,
+                "formatter": "default",
+                "filename": str(app_log_file),
+                "mode": "a" if append_locked_logs else "w",
+                "encoding": "utf-8",
+            }
+            app_handlers.append("app_file")
+
+        if self._can_open_for_append(tests_log_file):
+            handlers["test_file"] = {
+                "class": "logging.FileHandler",
+                "level": log_level,
+                "formatter": "default",
+                "filename": str(tests_log_file),
+                "mode": "a" if append_locked_logs else "w",
+                "encoding": "utf-8",
+            }
+            test_handlers.append("test_file")
+
         dictConfig(
             {
                 "version": 1,
@@ -52,35 +89,12 @@ class LoggerManager:
                         "datefmt": date_format,
                     }
                 },
-                "handlers": {
-                    "console": {
-                        "class": "logging.StreamHandler",
-                        "level": log_level,
-                        "formatter": "default",
-                        "stream": "ext://sys.stdout",
-                    },
-                    "app_file": {
-                        "class": "logging.FileHandler",
-                        "level": log_level,
-                        "formatter": "default",
-                        "filename": str(app_log_file),
-                        "mode": "a" if append_locked_logs else "w",
-                        "encoding": "utf-8",
-                    },
-                    "test_file": {
-                        "class": "logging.FileHandler",
-                        "level": log_level,
-                        "formatter": "default",
-                        "filename": str(tests_log_file),
-                        "mode": "a" if append_locked_logs else "w",
-                        "encoding": "utf-8",
-                    },
-                },
+                "handlers": handlers,
                 "loggers": {
                     **{
                         logger_name: {
                             "level": log_level,
-                            "handlers": ["console", "app_file"],
+                            "handlers": app_handlers,
                             "propagate": False,
                         }
                         for logger_name in self.LOGGER_NAMES
@@ -88,7 +102,7 @@ class LoggerManager:
                     **{
                         logger_name: {
                             "level": log_level,
-                            "handlers": ["test_file"],
+                            "handlers": test_handlers,
                             "propagate": False,
                         }
                         for logger_name in self.TEST_LOGGER_NAMES
@@ -96,7 +110,7 @@ class LoggerManager:
                 },
                 "root": {
                     "level": log_level,
-                    "handlers": ["console", "app_file"],
+                    "handlers": app_handlers,
                 },
             }
         )
@@ -126,6 +140,15 @@ class LoggerManager:
             path.unlink()
             return True
         except PermissionError:
+            return False
+
+    @staticmethod
+    def _can_open_for_append(path: Path) -> bool:
+        try:
+            with path.open("a", encoding="utf-8"):
+                pass
+            return True
+        except OSError:
             return False
 
 
