@@ -806,11 +806,23 @@ class ApiModerationService:
     ) -> tuple[ModerationAction, ...]:
         bundles = {
             ModerationAction.DELETE_WARN: (ModerationAction.WARN,),
+            # Discord may safely fall back to WARN when a member cannot be
+            # restricted (role hierarchy or permission constraints).  Preserve
+            # that terminal outcome instead of rejecting it as a conflict.
             ModerationAction.TIMEOUT: (
                 ModerationAction.DELETE,
                 ModerationAction.TIMEOUT,
+                ModerationAction.WARN,
             ),
-            ModerationAction.KICK: (ModerationAction.DELETE, ModerationAction.KICK),
-            ModerationAction.BAN: (ModerationAction.DELETE, ModerationAction.BAN),
+            ModerationAction.KICK: (
+                ModerationAction.DELETE,
+                ModerationAction.KICK,
+                ModerationAction.WARN,
+            ),
+            ModerationAction.BAN: (
+                ModerationAction.DELETE,
+                ModerationAction.BAN,
+                ModerationAction.WARN,
+            ),
         }
         return bundles.get(decision_action, (decision_action,))
