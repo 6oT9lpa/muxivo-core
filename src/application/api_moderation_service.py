@@ -804,25 +804,15 @@ class ApiModerationService:
     def _allowed_execution_actions(
         self, decision_action: ModerationAction
     ) -> tuple[ModerationAction, ...]:
-        bundles = {
-            ModerationAction.DELETE_WARN: (ModerationAction.WARN,),
-            # Discord may safely fall back to WARN when a member cannot be
-            # restricted (role hierarchy or permission constraints).  Preserve
-            # that terminal outcome instead of rejecting it as a conflict.
-            ModerationAction.TIMEOUT: (
-                ModerationAction.DELETE,
-                ModerationAction.TIMEOUT,
-                ModerationAction.WARN,
-            ),
-            ModerationAction.KICK: (
-                ModerationAction.DELETE,
-                ModerationAction.KICK,
-                ModerationAction.WARN,
-            ),
-            ModerationAction.BAN: (
-                ModerationAction.DELETE,
-                ModerationAction.BAN,
-                ModerationAction.WARN,
-            ),
-        }
-        return bundles.get(decision_action, (decision_action,))
+        """Accept the terminal action actually executed by the platform.
+
+        A Core decision is a recommendation.  The Discord bot subsequently
+        applies the guild policy and enforcement-mode guardrails, which may
+        deliberately turn the recommendation into LOG, REVIEW, WARN, or a
+        stronger configured action.  Rejecting that actual terminal result as
+        a conflict makes observability fail after the moderation has already
+        completed.  The API request schema still restricts this value to the
+        canonical moderation-action enum.
+        """
+        del decision_action
+        return tuple(ModerationAction)
