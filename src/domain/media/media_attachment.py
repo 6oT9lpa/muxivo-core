@@ -8,7 +8,7 @@ class MediaAttachment(BaseModel):
     download_url: str | None = Field(default=None, max_length=2_048)
     media_reference: str | None = Field(default=None, min_length=1, max_length=512)
     file_name: str | None = Field(default=None, max_length=255)
-    content_type: str = Field(min_length=1, max_length=127)
+    content_type: str | None = Field(default=None, max_length=127)
     file_size: int = Field(gt=0)
     width: int | None = Field(default=None, gt=0)
     height: int | None = Field(default=None, gt=0)
@@ -18,4 +18,3 @@ class MediaAttachment(BaseModel):
         if (self.download_url is None) == (self.media_reference is None):
             raise ValueError("exactly one media source is required")
         return self
-

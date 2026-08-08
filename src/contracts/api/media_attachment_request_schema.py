@@ -9,7 +9,9 @@ class MediaAttachmentRequestSchema(ApiModel):
     download_url: HttpUrl | None = Field(default=None, max_length=2_048)
     media_reference: str | None = Field(default=None, min_length=1, max_length=512)
     file_name: str | None = Field(default=None, max_length=255)
-    content_type: str = Field(min_length=1, max_length=127, pattern=r"^[A-Za-z0-9!#$&^_.+-]+/[A-Za-z0-9!#$&^_.+-]+$")
+    # Discord documents this field as optional. The downloaded bytes decide the
+    # actual format; this value is retained as an untrusted transport hint.
+    content_type: str | None = Field(default=None, max_length=127, pattern=r"^[A-Za-z0-9!#$&^_.+-]+/[A-Za-z0-9!#$&^_.+-]+$")
     file_size: int = Field(gt=0, le=104_857_600)
     width: int | None = Field(default=None, gt=0, le=100_000)
     height: int | None = Field(default=None, gt=0, le=100_000)
@@ -28,9 +30,8 @@ class MediaAttachmentRequestSchema(ApiModel):
             download_url=str(self.download_url) if self.download_url is not None else None,
             media_reference=self.media_reference,
             file_name=self.file_name,
-            content_type=self.content_type.casefold(),
+            content_type=self.content_type.casefold() if self.content_type else None,
             file_size=self.file_size,
             width=self.width,
             height=self.height,
         )
-

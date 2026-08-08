@@ -39,7 +39,7 @@ class ApiSettings(BaseSettings):
     media_max_pixels: int = Field(default=40_000_000, ge=1, le=100_000_000)
     media_download_timeout_seconds: float = Field(default=10.0, gt=0.0, le=60.0)
     media_max_redirects: int = Field(default=2, ge=0, le=5)
-    media_allowed_content_types: tuple[str, ...] = ("image/jpeg", "image/png", "image/webp")
+    media_allowed_content_types: tuple[str, ...] = ("image/gif", "image/jpeg", "image/png", "image/webp")
     media_allowed_download_hosts: tuple[str, ...] = ("cdn.discordapp.com", "media.discordapp.net")
     media_retention_hours: int = Field(default=24, ge=1, le=720)
     media_hash_cache_ttl: int = Field(default=24, ge=1, le=720)

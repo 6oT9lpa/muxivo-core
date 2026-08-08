@@ -40,6 +40,15 @@ def test_media_contract_accepts_strict_synchronized_payload() -> None:
     assert request.attachments[0].to_domain().download_url is not None
 
 
+def test_media_contract_accepts_missing_optional_discord_content_type() -> None:
+    attachment = MediaAttachmentRequestSchema(
+        attachment_id="5",
+        download_url="https://cdn.discordapp.com/attachments/1/2/image.png",
+        file_size=128,
+    )
+    assert attachment.content_type is None
+
+
 @pytest.mark.parametrize(
     "changes",
     (
@@ -75,4 +84,3 @@ def test_media_contract_rejects_attachment_count_mismatch() -> None:
             message=_message(attachment_count=2),
             attachments=(_attachment(),),
         )
-

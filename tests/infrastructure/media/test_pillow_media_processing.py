@@ -3,7 +3,7 @@ from io import BytesIO
 import pytest
 from PIL import Image
 
-from src.application.media_error import MediaValidationError, UnsupportedMediaError
+from src.application.media_error import MediaValidationError
 from src.domain.media.downloaded_media import DownloadedMedia
 from src.infrastructure.media.pillow_media_hasher import PillowMediaHasher
 from src.infrastructure.media.pillow_media_validator import PillowMediaValidator
@@ -27,7 +27,7 @@ def _downloaded(content: bytes, content_type: str = "image/png") -> DownloadedMe
 
 def _validator(max_pixels: int = 1_000_000) -> PillowMediaValidator:
     return PillowMediaValidator(
-        allowed_content_types=("image/png", "image/jpeg", "image/webp"),
+        allowed_content_types=("image/gif", "image/png", "image/jpeg", "image/webp"),
         max_width=1_000,
         max_height=1_000,
         max_pixels=max_pixels,
@@ -47,9 +47,9 @@ async def test_validator_detects_mime_and_hasher_is_deterministic() -> None:
 
 
 @pytest.mark.asyncio
-async def test_validator_rejects_spoofed_mime_and_malformed_image() -> None:
-    with pytest.raises(UnsupportedMediaError):
-        await _validator().validate(_downloaded(_image_bytes(), "image/jpeg"))
+async def test_validator_uses_decoded_bytes_when_declared_mime_is_wrong() -> None:
+    validated = await _validator().validate(_downloaded(_image_bytes(), "image/jpeg"))
+    assert validated.detected_mime == "image/png"
     with pytest.raises(MediaValidationError):
         await _validator().validate(_downloaded(b"not-an-image"))
 
@@ -61,10 +61,10 @@ async def test_validator_rejects_oversized_decoded_pixels() -> None:
 
 
 @pytest.mark.asyncio
-async def test_validator_rejects_animated_images_explicitly() -> None:
+async def test_validator_extracts_first_gif_frame_for_analysis() -> None:
     output = BytesIO()
     frames = [Image.new("RGB", (8, 8), color) for color in ((0, 0, 0), (255, 255, 255))]
-    frames[0].save(output, format="WEBP", save_all=True, append_images=frames[1:], duration=10)
-    with pytest.raises(UnsupportedMediaError):
-        await _validator().validate(_downloaded(output.getvalue(), "image/webp"))
-
+    frames[0].save(output, format="GIF", save_all=True, append_images=frames[1:], duration=10)
+    validated = await _validator().validate(_downloaded(output.getvalue(), "image/gif"))
+    assert validated.detected_mime == "image/gif"
+    assert validated.analysis_bytes

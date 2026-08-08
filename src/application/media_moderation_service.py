@@ -229,40 +229,13 @@ class MediaModerationService:
     def _validate_request_limits(self, request: MediaModerationRequestSchema) -> None:
         if len(request.attachments) > self._runtime_config.max_attachments:
             raise MediaValidationError("too many media attachments")
-        if any(
-            attachment.file_size > self._runtime_config.max_file_size_bytes
-            for attachment in request.attachments
-        ):
-            raise MediaValidationError("declared media size exceeds per-file limit")
-        if (
-            sum(attachment.file_size for attachment in request.attachments)
-            > self._runtime_config.max_total_size_bytes
-        ):
-            raise MediaValidationError("declared media size exceeds request limit")
-        for attachment in request.attachments:
-            if (
-                attachment.width is not None
-                and attachment.width > self._runtime_config.max_width
-            ):
-                raise MediaValidationError("declared media width exceeds limit")
-            if (
-                attachment.height is not None
-                and attachment.height > self._runtime_config.max_height
-            ):
-                raise MediaValidationError("declared media height exceeds limit")
-            if (
-                attachment.width is not None
-                and attachment.height is not None
-                and attachment.width * attachment.height
-                > self._runtime_config.max_pixels
-            ):
-                raise MediaValidationError("declared media pixels exceed limit")
 
     async def _ingest_attachment(
         self,
         attachment: MediaAttachment,
     ) -> tuple[MediaAttachmentAnalysis, ValidatedMedia | None]:
         try:
+            self._validate_attachment_hint(attachment)
             downloaded = await self._downloader.download(attachment)
             validated = await self._validator.validate(downloaded)
             hashes = await self._hasher.calculate(downloaded, validated)
@@ -305,6 +278,21 @@ class MediaModerationService:
             ),
             validated,
         )
+
+    def _validate_attachment_hint(self, attachment: MediaAttachment) -> None:
+        """Contain invalid metadata to this attachment instead of rejecting its message."""
+        if attachment.file_size > self._runtime_config.max_file_size_bytes:
+            raise MediaValidationError("declared media size exceeds per-file limit")
+        if attachment.width is not None and attachment.width > self._runtime_config.max_width:
+            raise MediaValidationError("declared media width exceeds limit")
+        if attachment.height is not None and attachment.height > self._runtime_config.max_height:
+            raise MediaValidationError("declared media height exceeds limit")
+        if (
+            attachment.width is not None
+            and attachment.height is not None
+            and attachment.width * attachment.height > self._runtime_config.max_pixels
+        ):
+            raise MediaValidationError("declared media pixels exceed limit")
 
     async def _run_providers(
         self,
