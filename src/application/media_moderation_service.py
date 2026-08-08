@@ -490,7 +490,13 @@ class MediaModerationService:
                         guild_id=guild_id,
                         attachment_id=analysis.attachment.attachment_id,
                         file_name=analysis.attachment.file_name,
-                        declared_mime=analysis.attachment.content_type,
+                        # Discord may omit content_type. Persistence keeps a
+                        # stable, non-sensitive fallback while detected_mime
+                        # remains the authoritative bytes-derived format.
+                        declared_mime=(
+                            analysis.attachment.content_type
+                            or "application/octet-stream"
+                        ),
                         detected_mime=analysis.detected_mime,
                         file_size=analysis.actual_file_size
                         or analysis.attachment.file_size,

@@ -143,6 +143,25 @@ def _request() -> MediaModerationRequestSchema:
 
 
 @pytest.mark.asyncio
+async def test_media_service_persists_fallback_for_missing_declared_mime() -> None:
+    moderation = _Moderation()
+    attachments = _Repository()
+    service = MediaModerationService(
+        moderation_service=moderation,
+        downloader=_Downloader(),
+        validator=PillowMediaValidator(
+            allowed_content_types=("image/png",), max_width=100, max_height=100, max_pixels=10_000
+        ),
+        hasher=PillowMediaHasher(), ocr_provider=_Ocr(), image_provider=_Image(),
+        attachment_repository=attachments, analysis_repository=_Repository(),
+        runtime_config=MediaRuntimeConfig(enabled=True, required=False, max_attachments=4, max_file_size_bytes=1_000_000, max_total_size_bytes=2_000_000, max_width=100, max_height=100, max_pixels=10_000, retention_hours=24, hash_cache_ttl_hours=24, input_version="v1", ocr_required=False, image_required=False),
+    )
+    request = _request().model_copy(update={"attachments": (_request().attachments[0].model_copy(update={"content_type": None}), _request().attachments[1])})
+    await service.moderate(request, "correlation")
+    assert attachments.records[0].declared_mime == "application/octet-stream"
+
+
+@pytest.mark.asyncio
 async def test_media_service_produces_one_decision_and_deduplicates_exact_image() -> None:
     moderation = _Moderation()
     attachments = _Repository()
