@@ -1,6 +1,6 @@
 param(
-    [string]$Archive = (Join-Path $env:TEMP 'ai-moder-release.tar.gz'),
-    [string]$ModelArchive = (Join-Path $env:TEMP 'ai-moder-model.tar.gz'),
+    [string]$Archive = (Join-Path $env:TEMP 'muxivo-core-release.tar.gz'),
+    [string]$ModelArchive = (Join-Path $env:TEMP 'muxivo-core-model.tar.gz'),
     [string]$ModelDirectory = (Join-Path (Split-Path $PSScriptRoot -Parent | Split-Path -Parent) 'models/rubert-tiny2-moderation-trained')
 )
 
@@ -36,7 +36,7 @@ tar --exclude='./.git' `
     --exclude='./.ollama' `
     -czf $Archive .
 
-Write-Host "AI moderator release archive created: $Archive"
+Write-Host "Muxivo Core release archive created: $Archive"
 
 if (-not (Test-Path -LiteralPath $ModelDirectory)) {
     throw "Trained model directory was not found: $ModelDirectory"
@@ -69,4 +69,4 @@ finally {
     Pop-Location
 }
 
-Write-Host "AI moderator model archive created: $ModelArchive"
+Write-Host "Muxivo Core model archive created: $ModelArchive"

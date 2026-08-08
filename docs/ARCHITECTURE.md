@@ -1,4 +1,4 @@
-# AI Moderator Architecture
+# Muxivo Core Architecture
 
 ## Logical components
 

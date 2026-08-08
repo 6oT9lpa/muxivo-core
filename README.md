@@ -1,7 +1,9 @@
-# AI Moderator
+# Muxivo Core
 
-AI Moderator is a local moderation engine and HTTP API for community platforms.
-It is currently used by OmniBot to analyze selected Discord channels through a
+![Muxivo logo](./docs/images/muxivo-logo.png)
+
+Muxivo Core is a local moderation engine and HTTP API for community platforms.
+It is currently used by Muxivo Discord to analyze selected Discord channels through a
 self-hosted API.
 
 The project is platform-independent at the core: Discord, Telegram, dashboards,
@@ -26,7 +28,7 @@ Ready components:
 - a separate, disabled-by-default media endpoint with SSRF-safe Discord CDN
   downloading, decoded-image validation, exact/perceptual hashes, OCR integration,
   and a versioned image-detector port;
-- deployment scripts for `/opt/ai-moder`;
+- deployment scripts for `/opt/muxivo-core`;
 - training, evaluation, and model utility scripts;
 - load-testing module and local testing script.
 
@@ -160,7 +162,7 @@ Important endpoints:
 - `GET /api/policies/effective` - inspect effective policies.
 
 The API should be protected by an internal API key and network boundary. In the
-OmniBot deployment it listens on localhost and is called by the Discord bot
+Muxivo Discord deployment it listens on localhost and is called by the Discord bot
 backend.
 
 Database schema changes are owned exclusively by Alembic and applied during
@@ -171,7 +173,7 @@ API contract rather than mapped to a stronger fallback action.
 
 The optional known-scam registry is a JSON array of objects containing a
 validated `sha256`, `phash`, or both. Exact SHA-256 matches and pHash matches
-within `AI_MODERATOR_MEDIA_KNOWN_SCAM_PHASH_DISTANCE` produce an explicit SCAM
+within `MUXIVO_CORE_MEDIA_KNOWN_SCAM_PHASH_DISTANCE` produce an explicit SCAM
 signal. Promotion from shadow mode can be gated with
 `scripts/evaluation/check_shadow_acceptance.py`.
 
@@ -227,8 +229,8 @@ LOG_LEVEL=INFO
 ```
 
 Media moderation is off by default. Its complete settings are documented in
-`.env.example`; the important switches are `AI_MODERATOR_MEDIA_ENABLED`,
-`AI_MODERATOR_MEDIA_REQUIRED`, the per-file/request/dimension limits, the exact
+`.env.example`; the important switches are `MUXIVO_CORE_MEDIA_ENABLED`,
+`MUXIVO_CORE_MEDIA_REQUIRED`, the per-file/request/dimension limits, the exact
 Discord CDN host allowlist, retention, cache TTL, and separately validated OCR
 and YOLO settings.
 
@@ -249,7 +251,7 @@ therefore reports unavailable instead of returning synthetic detections.
 
 Media metadata and versioned analysis results are stored in PostgreSQL. Original
 image bytes are not persisted. Redacted OCR fields use
-`AI_MODERATOR_MEDIA_RETENTION_HOURS`; deployments should run their normal
+`MUXIVO_CORE_MEDIA_RETENTION_HOURS`; deployments should run their normal
 retention cleanup against `retention_until`. Cached results are considered
 compatible only when model name/version, input pipeline version, and policy
 version all match.
@@ -272,7 +274,7 @@ Model artifacts are intentionally not packed into release archives by default.
 Deploy the trained model separately into:
 
 ```text
-/opt/ai-moder/models/rubert-tiny2-moderation-trained
+/opt/muxivo-core/models/rubert-tiny2-moderation-trained
 ```
 
 ## Deployment
@@ -281,36 +283,36 @@ Build a release archive without secrets, logs, virtual environments, runtime
 data, and model artifacts:
 
 ```powershell
-scripts/deploy/build_ai_moder_release.ps1
+scripts/deploy/build_muxivo_core_release.ps1
 ```
 
 Upload and deploy to the local server:
 
 ```powershell
-scripts/deploy/deploy_ai_moder_local.ps1 `
-  -SshPassword $env:AI_MODER_SSH_PASSWORD `
-  -RootPassword $env:AI_MODER_ROOT_PASSWORD
+scripts/deploy/deploy_muxivo_core_local.ps1 `
+  -SshPassword $env:MUXIVO_CORE_SSH_PASSWORD `
+  -RootPassword $env:MUXIVO_CORE_ROOT_PASSWORD
 ```
 
 Production directory:
 
 ```text
-/opt/ai-moder
+/opt/muxivo-core
 ```
 
 Systemd service:
 
 ```bash
-sudo systemctl enable ai-moder.service
-sudo systemctl restart ai-moder.service
-sudo systemctl status ai-moder.service
+sudo systemctl enable muxivo-core.service
+sudo systemctl restart muxivo-core.service
+sudo systemctl status muxivo-core.service
 ```
 
 GPU check:
 
 ```bash
 nvidia-smi
-/opt/ai-moder/.venv/bin/python - <<'PY'
+/opt/muxivo-core/.venv/bin/python - <<'PY'
 import torch
 print(torch.cuda.is_available())
 print(torch.cuda.device_count())
@@ -334,7 +336,7 @@ python scripts/testing/run_moderation_load_test.py --base-url http://127.0.0.1:8
 
 ## Data And Privacy
 
-AI Moderator may process message text, platform IDs, policy metadata, labels,
+Muxivo Core may process message text, platform IDs, policy metadata, labels,
 risk scores, confidence values, and technical logs. See:
 
 - [Privacy Policy](./docs/PRIVACY_POLICY.md)

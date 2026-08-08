@@ -1,22 +1,22 @@
-# Privacy Policy for AI Moderator
+# Privacy Policy for Muxivo Core
 
 **Effective Date:** July 10, 2026  
 **Last Updated:** July 23, 2026
 
-This policy explains what data AI Moderator processes when it is used as a
+This policy explains what data Muxivo Core processes when it is used as a
 local/self-hosted moderation API.
 
 ## 1. Operator
 
-Project operator: **6oT9lpa / AI Moderator project team**.
+Project operator: **6oT9lpa / Muxivo Core project team**.
 
-The organization or server administrator deploying AI Moderator is responsible
+The organization or server administrator deploying Muxivo Core is responsible
 for choosing which platform messages are sent to the API and for informing users
 when AI moderation is active.
 
 ## 2. Data Processed
 
-AI Moderator may process:
+Muxivo Core may process:
 
 - platform name, guild/server/chat ID, channel ID, message ID, and user ID;
 - message text and normalized text;
@@ -101,7 +101,7 @@ Recommended safeguards:
 
 ## 8. Limitations
 
-AI Moderator may produce false positives and false negatives. It should assist
+Muxivo Core may produce false positives and false negatives. It should assist
 moderation teams, not replace human judgment or appeals.
 
 ## 9. Changes

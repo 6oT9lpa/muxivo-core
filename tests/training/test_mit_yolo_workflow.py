@@ -57,9 +57,9 @@ def test_training_wrapper_stages_dataset_config_and_uses_bounded_arguments(
 
     train_mit_yolo.main()
 
-    assert (checkout / "yolo" / "config" / "dataset" / "ai_moderator.yaml").read_text() == dataset.read_text()
+    assert (checkout / "yolo" / "config" / "dataset" / "muxivo_core.yaml").read_text() == dataset.read_text()
     command, cwd, environment = calls[0]
-    assert "dataset=ai_moderator" in command
+    assert "dataset=muxivo_core" in command
     assert "task.epoch=1" in command
     assert "task.data.batch_size=2" in command
     assert "image_size=[640,640]" in command

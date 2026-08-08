@@ -48,7 +48,7 @@ def run_migrations_online() -> None:
     )
 
     if connectable.dialect.name != "postgresql":
-        raise RuntimeError("AI Moderator migrations require PostgreSQL")
+        raise RuntimeError("Muxivo Core migrations require PostgreSQL")
 
     with connectable.connect() as connection:
         context.configure(

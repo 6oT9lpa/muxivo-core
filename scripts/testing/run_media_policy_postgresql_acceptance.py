@@ -23,7 +23,7 @@ def main() -> None:
     args = parser.parse_args()
 
     temporary_root = Path(tempfile.gettempdir()).resolve()
-    acceptance_root = (temporary_root / "ai-moderator-pg-acceptance").resolve()
+    acceptance_root = (temporary_root / "muxivo-coreator-pg-acceptance").resolve()
     if not acceptance_root.is_relative_to(temporary_root) or acceptance_root == temporary_root:
         raise RuntimeError("unsafe PostgreSQL acceptance directory")
     data_directory = acceptance_root / "data"
@@ -42,7 +42,7 @@ def main() -> None:
     acceptance_root.mkdir()
 
     environment = os.environ.copy()
-    test_url = f"postgresql://postgres@127.0.0.1:{args.port}/ai_moderator_acceptance?connect_timeout=5"
+    test_url = f"postgresql://postgres@127.0.0.1:{args.port}/muxivo_core_acceptance?connect_timeout=5"
     environment.update(
         DATABASE_URL=test_url,
         TEST_POSTGRESQL_URL=test_url,
@@ -70,7 +70,7 @@ def main() -> None:
             [
                 str(psql), "--no-password", "-h", "127.0.0.1", "-p", str(args.port),
                 "-U", "postgres", "-d", "postgres", "-v", "ON_ERROR_STOP=1",
-                "-c", "CREATE DATABASE ai_moderator_acceptance",
+                "-c", "CREATE DATABASE muxivo_core_acceptance",
             ],
             env=environment,
         )
@@ -88,7 +88,7 @@ def main() -> None:
         run(
             [
                 str(psql), "--no-password", "-h", "127.0.0.1", "-p", str(args.port),
-                "-U", "postgres", "-d", "ai_moderator_acceptance", "-Atc",
+                "-U", "postgres", "-d", "muxivo_core_acceptance", "-Atc",
                 "SELECT version_num FROM alembic_version",
             ],
             env=environment,

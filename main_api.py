@@ -1,4 +1,4 @@
-"""Canonical production entry point for the AI Moderator HTTP service."""
+"""Canonical production entry point for the Muxivo Core HTTP service."""
 
 import asyncio
 import sys

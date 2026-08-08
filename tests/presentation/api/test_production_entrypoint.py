@@ -14,9 +14,9 @@ def test_production_entrypoint_imports_without_retired_sensitive_topic_config(
     environment = {
         **os.environ,
         "DATABASE_URL": "postgresql://ignored:ignored@127.0.0.1:1/ignored",
-        "AI_MODERATOR_INTERNAL_API_KEY": "entrypoint-smoke-key-32-characters",
-        "AI_MODERATOR_API_RUBERT_ENABLED": "false",
-        "AI_MODERATOR_API_RUBERT_REQUIRED": "false",
+        "MUXIVO_CORE_INTERNAL_API_KEY": "entrypoint-smoke-key-32-characters",
+        "MUXIVO_CORE_API_RUBERT_ENABLED": "false",
+        "MUXIVO_CORE_API_RUBERT_REQUIRED": "false",
         "PYTHONPATH": os.pathsep.join(
             filter(None, (str(root), os.environ.get("PYTHONPATH")))
         ),
@@ -31,4 +31,4 @@ def test_production_entrypoint_imports_without_retired_sensitive_topic_config(
         check=False,
     )
     assert result.returncode == 0, result.stderr
-    assert result.stdout.strip().endswith("AI Moderator")
+    assert result.stdout.strip().endswith("Muxivo Core")

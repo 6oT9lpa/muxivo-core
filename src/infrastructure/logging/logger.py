@@ -30,7 +30,7 @@ class LoggerManager:
         log_dir = Path("logs")
         log_dir.mkdir(parents=True, exist_ok=True)
 
-        app_log_file = log_dir / "ai-moder.log"
+        app_log_file = log_dir / "muxivo-core.log"
         tests_log_file = log_dir / "tests.log"
 
         append_locked_logs = False

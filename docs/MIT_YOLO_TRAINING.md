@@ -54,7 +54,7 @@ python scripts/training/export_mit_yolo_onnx.py `
 ```powershell
 python scripts/training/package_yolo_onnx.py `
   --onnx E:\models\runs\best.onnx `
-  --output-dir E:\AI-Moderator\models\media\yolo\moderation-v1 `
+  --output-dir E:\Muxivo Core\models\media\yolo\moderation-v1 `
   --model-name moderation-yolov9-s --model-version moderation-v1 `
   --class-name suspicious_qr --class-name fake_giveaway_banner `
   --output-layout xywh_classes
@@ -68,7 +68,7 @@ Benchmark the exact production provider and retain the JSON report with the mode
 
 ```powershell
 python -m scripts.media.benchmark_onnx_yolo `
-  --model-dir E:\AI-Moderator\models\media\yolo\moderation-v1 `
+  --model-dir E:\Muxivo Core\models\media\yolo\moderation-v1 `
   --image E:\datasets\moderation-images\benchmark.png `
   --device cuda --warmup 10 --iterations 100 `
   --output E:\models\reports\moderation-v1-gtx1650.json

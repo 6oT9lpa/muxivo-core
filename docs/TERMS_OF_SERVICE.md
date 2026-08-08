@@ -1,18 +1,18 @@
-# Terms of Service and Acceptable Use for AI Moderator
+# Terms of Service and Acceptable Use for Muxivo Core
 
 **Effective Date:** July 10, 2026  
 **Last Updated:** July 23, 2026
 
-These terms govern use of AI Moderator, including the local API, moderation
+These terms govern use of Muxivo Core, including the local API, moderation
 pipeline, rules, policies, trained model artifacts, scripts, and documentation.
 
 ## 1. Service Description
 
-AI Moderator provides local moderation analysis for platform messages. It may
+Muxivo Core provides local moderation analysis for platform messages. It may
 return labels, confidence values, risk scores, explanations, and recommended
 actions.
 
-It is designed to be integrated with platform adapters such as OmniBot, Discord
+It is designed to be integrated with platform adapters such as Muxivo Discord, Discord
 bots, Telegram bots, dashboards, and internal moderation tools.
 
 ## 2. Administrator Responsibilities
@@ -35,7 +35,7 @@ non-production environment first.
 
 ## 3. Acceptable Use
 
-You may use AI Moderator, with proper commercial permission, to:
+You may use Muxivo Core, with proper commercial permission, to:
 
 - moderate communities you own or administer;
 - detect spam, scams, abuse, unsafe content, and policy violations;
@@ -45,7 +45,7 @@ You may use AI Moderator, with proper commercial permission, to:
 
 ## 4. Prohibited Use
 
-You may not use AI Moderator to:
+You may not use Muxivo Core to:
 
 - violate laws, platform rules, or privacy rights;
 - harass, discriminate against, or target users unfairly;
@@ -57,7 +57,7 @@ You may not use AI Moderator to:
 
 ## 5. AI Limitations and Automated Enforcement
 
-AI Moderator is an assistive system. It may be wrong. Operators must use human
+Muxivo Core is an assistive system. It may be wrong. Operators must use human
 judgment for severe penalties, appeals, edge cases, and policy changes.
 
 Classifier output is not a command to punish a user. Labels, scores,

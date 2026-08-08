@@ -20,7 +20,7 @@ logger = get_logger(__name__)
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Load test the local AI Moderator API.")
+    parser = argparse.ArgumentParser(description="Load test the local Muxivo Core API.")
     parser.add_argument("--base-url", default="http://127.0.0.1:8000")
     parser.add_argument("--channels", type=int, default=20)
     parser.add_argument("--users", type=int, default=100)
@@ -53,9 +53,9 @@ async def run() -> int:
         logger.error("Load test configuration is invalid errors=%s", exc.error_count())
         return 2
 
-    api_key = os.environ.get("AI_MODERATOR_INTERNAL_API_KEY", "")
+    api_key = os.environ.get("MUXIVO_CORE_INTERNAL_API_KEY", "")
     if not api_key:
-        logger.error("Load test rejected because AI_MODERATOR_INTERNAL_API_KEY is not configured")
+        logger.error("Load test rejected because MUXIVO_CORE_INTERNAL_API_KEY is not configured")
         return 2
 
     result = await ModerationApiLoadTestRunner(config, internal_api_key=api_key).run()

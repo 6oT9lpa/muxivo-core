@@ -50,7 +50,7 @@ def main() -> None:
     if not args.dataset_config.is_file():
         raise FileNotFoundError(f"dataset config is missing: {args.dataset_config}")
     prepare_checkout(args.checkout.resolve())
-    dataset_name = "ai_moderator"
+    dataset_name = "muxivo_core"
     upstream_dataset_config = args.checkout.resolve() / "yolo" / "config" / "dataset" / f"{dataset_name}.yaml"
     if args.dataset_config.resolve() != upstream_dataset_config.resolve():
         shutil.copy2(args.dataset_config.resolve(), upstream_dataset_config)

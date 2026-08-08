@@ -17,6 +17,7 @@ from src.presentation.api.feedback_router import router as feedback_router
 from src.presentation.api.health_router import router as health_router
 from src.presentation.api.moderation_router import router as moderation_router
 from src.presentation.api.policy_router import router as policy_router
+from src.domain.product_identity import PRODUCT_NAME
 
 logger = get_logger(__name__)
 
@@ -27,7 +28,7 @@ def create_api_application(
     container: ApiContainer | None = None,
 ) -> FastAPI:
     if not settings.internal_api_key:
-        raise RuntimeError("AI_MODERATOR_INTERNAL_API_KEY must be configured")
+        raise RuntimeError("MUXIVO_CORE_INTERNAL_API_KEY must be configured")
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -59,7 +60,7 @@ def create_api_application(
     docs_url = "/docs" if settings.api_docs_enabled else None
     redoc_url = "/redoc" if settings.api_docs_enabled else None
     openapi_url = "/openapi.json" if settings.api_docs_enabled else None
-    app = FastAPI(title="AI Moderator", docs_url=docs_url, redoc_url=redoc_url, openapi_url=openapi_url, lifespan=lifespan)
+    app = FastAPI(title=PRODUCT_NAME, docs_url=docs_url, redoc_url=redoc_url, openapi_url=openapi_url, lifespan=lifespan)
     register_api_exception_handlers(app)
     _register_security_middleware(app, settings)
     app.include_router(health_router)

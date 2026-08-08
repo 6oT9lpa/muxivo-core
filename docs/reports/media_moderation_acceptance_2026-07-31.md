@@ -2,9 +2,9 @@
 
 ## Verified locally
 
-- AI-Moderator full suite: `1666 passed, 1 skipped` (`python -m pytest -q`). The skipped test is the
+- Muxivo Core full suite: `1666 passed, 1 skipped` (`python -m pytest -q`). The skipped test is the
   explicitly gated disposable-PostgreSQL integration test.
-- OmniBot full Python suite: `216 passed, 41 skipped` with coverage disabled because the existing
+- Muxivo Discord full Python suite: `216 passed, 41 skipped` with coverage disabled because the existing
   `.coverage` file was locked by another process.
 - Activity: `16 passed` (`npm test -- --run`) and a successful `tsc && vite build`.
 - ONNX Runtime `1.28.0` installed on Python 3.14; `pip check` reported no broken requirements.
@@ -14,7 +14,7 @@
   `0002_media_policy_snapshots`. The real repository lifecycle passed: SAVE revision 1, stale-write
   conflict, SAVE revision 2, RESET revision 3, and the exact three audit records. The runner stopped
   and removed the cluster afterward.
-- Runtime searches found no `IMAGE_SCAM` in OmniBot. Its only AI-Moderator occurrences are negative
+- Runtime searches found no `IMAGE_SCAM` in Muxivo Discord. Its only Muxivo Core occurrences are negative
   tests that verify the value is rejected.
 - A real PaddleOCR CPU smoke had previously completed with three Russian/English/URL lines,
   mean confidence `0.9693473`, and `1507 ms` latency using the verified local model bundle.
@@ -32,7 +32,7 @@
 
 ## Implemented commits
 
-AI-Moderator:
+Muxivo Core:
 
 - `703bf09` strict OCR and detector YAML defaults.
 - `72f7a46`, `ee8b845` verified PaddleOCR v3 CPU runtime and Windows hardening.
@@ -44,7 +44,7 @@ AI-Moderator:
 - `da4a0f7` Alembic psycopg 3 URL handling.
 - Verified CUDA training wrapper and runtime-compatible ONNX export adapter.
 
-OmniBot:
+Muxivo Discord:
 
 - `161e3e9` Activity/backend media-policy save, reload, reset, conflict and unavailable flow.
 
@@ -57,7 +57,7 @@ These checks were not represented as successful:
 - Production ONNX/TensorRT accuracy and latency cannot be measured because no trained moderation
   detector artifact exists. The mock ONNX execution evidence above must not be used as model quality.
 - GTX 1650 FP16/INT8 benchmarking requires that physical production GPU and an engine built on it.
-- The real Discord Activity scenarios A–E require a deployed test environment, Discord session,
+- The real Muxivo DS Activity scenarios A–E require a deployed test environment, Discord session,
   test guild and explicit deployment authority. No deployment, push or remote-server mutation was
   performed.
 

@@ -1,22 +1,22 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ARCHIVE="${ARCHIVE:-/tmp/ai-moder-release.tar.gz}"
+ARCHIVE="${ARCHIVE:-/tmp/muxivo-core-release.tar.gz}"
 MODEL_ARCHIVE="${MODEL_ARCHIVE:-}"
 ROOT_TMP="${ROOT_TMP:-/root/tmp}"
-APP_DIR="${APP_DIR:-/opt/ai-moder}"
+APP_DIR="${APP_DIR:-/opt/muxivo-core}"
 BACKUP_DIR="${BACKUP_DIR:-/opt}"
-BACKUP="$BACKUP_DIR/ai-moder.backup-$(date +%Y%m%d%H%M%S).tgz"
-ROOT_ARCHIVE="$ROOT_TMP/ai-moder-release.tar.gz"
+BACKUP="$BACKUP_DIR/muxivo-core.backup-$(date +%Y%m%d%H%M%S).tgz"
+ROOT_ARCHIVE="$ROOT_TMP/muxivo-core-release.tar.gz"
 ENV_FILE="${ENV_FILE:-}"
-SERVICES=(${SERVICES:-ai-moder.service})
+SERVICES=(${SERVICES:-muxivo-core.service})
 
 log() {
-    printf '[ai-moder-deploy] %s\n' "$*"
+    printf '[muxivo-core-deploy] %s\n' "$*"
 }
 
 mkdir -p "$ROOT_TMP"
-id -u ai-moder >/dev/null 2>&1 || useradd --system --create-home --home-dir /opt/ai-moder --shell /usr/sbin/nologin ai-moder
+id -u muxivo-core >/dev/null 2>&1 || useradd --system --create-home --home-dir /opt/muxivo-core --shell /usr/sbin/nologin muxivo-core
 
 log "Copy archive to root tmp..."
 cp "$ARCHIVE" "$ROOT_ARCHIVE"
@@ -55,9 +55,9 @@ fi
 python3 -m venv "$APP_DIR/.venv"
 "$APP_DIR/.venv/bin/pip" install --upgrade pip
 "$APP_DIR/.venv/bin/pip" install -r "$APP_DIR/requirements.txt"
-install -o root -g root -m 644 "$APP_DIR/scripts/deploy/ai-moder.service" /etc/systemd/system/ai-moder.service
+install -o root -g root -m 644 "$APP_DIR/scripts/deploy/muxivo-core.service" /etc/systemd/system/muxivo-core.service
 mkdir -p "$APP_DIR/logs"
-chown -R ai-moder:ai-moder "$APP_DIR"
+chown -R muxivo-core:muxivo-core "$APP_DIR"
 systemctl daemon-reload
 
 log "Start services..."

@@ -1,8 +1,8 @@
-# AI Moderator Commercial License Terms
+# Muxivo Core Commercial License Terms
 
 Copyright (c) 2026 OmniDev Corp. All rights reserved.
 
-These terms are a baseline commercial license template for paid AI Moderator
+These terms are a baseline commercial license template for paid Muxivo Core
 customers. They apply only when the copyright holder grants a written commercial
 license, invoice, order form, contract, or other written permission that
 references this file or clearly grants commercial rights.

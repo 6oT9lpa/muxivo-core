@@ -6,7 +6,7 @@ class ApiSettings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
-        env_prefix="AI_MODERATOR_",
+        env_prefix="MUXIVO_CORE_",
         case_sensitive=False,
         extra="ignore",
     )
