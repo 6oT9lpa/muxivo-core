@@ -118,8 +118,10 @@ def _topic_slices(
     labels: np.ndarray,
     thresholds: np.ndarray,
     label_names: list[str],
-    matcher: SensitiveTopicMatcher,
+    matcher: SensitiveTopicMatcher | None,
 ) -> dict[str, Any]:
+    if matcher is None:
+        return {}
     topic_indices: dict[str, list[int]] = {"family": [], "race": [], "gender": []}
     for index, row in enumerate(rows):
         for topic in matcher.detect_topics(row["text"]):
@@ -278,7 +280,7 @@ def compare(
     models: list[tuple[str, Path]],
     dataset_dir: Path,
     test_path: Path,
-    topic_config: Path,
+    topic_config: Path | None,
     batch_size: int,
     latency_samples: int,
     filter_overlaps: bool = True,
@@ -293,7 +295,11 @@ def compare(
         rows = original_rows
         overlap_count = 0
     labels = np.asarray([row["labels"] for row in rows], dtype=np.int32)
-    matcher = SensitiveTopicMatcher.from_yaml(topic_config)
+    matcher = (
+        SensitiveTopicMatcher.from_yaml(topic_config)
+        if topic_config is not None
+        else None
+    )
 
     model_results: dict[str, Any] = {}
     expected_labels: list[str] | None = None
@@ -368,7 +374,12 @@ def main() -> None:
     )
     parser.add_argument("--dataset-dir", type=Path, default=DEFAULT_DATASET_DIR)
     parser.add_argument("--test-path", type=Path, default=DEFAULT_TEST_PATH)
-    parser.add_argument("--topic-config", type=Path, default=DEFAULT_TOPIC_CONFIG)
+    parser.add_argument(
+        "--topic-config",
+        type=Path,
+        default=None,
+        help="Optional sensitive-topic policy for topic slices. Omit for a plain split evaluation.",
+    )
     parser.add_argument("--batch-size", type=int, default=128)
     parser.add_argument("--latency-samples", type=int, default=200)
     parser.add_argument(
@@ -383,7 +394,7 @@ def main() -> None:
         models=args.model,
         dataset_dir=args.dataset_dir.resolve(),
         test_path=args.test_path.resolve(),
-        topic_config=args.topic_config.resolve(),
+        topic_config=args.topic_config.resolve() if args.topic_config else None,
         batch_size=args.batch_size,
         latency_samples=args.latency_samples,
         filter_overlaps=not args.skip_overlap_filter,

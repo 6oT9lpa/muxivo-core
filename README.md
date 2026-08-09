@@ -6,18 +6,21 @@ The core is platform-independent. Discord, Telegram, web applications, and futur
 
 ## Production release
 
-The production text-classification release is **ruBERT Tiny2 Moderation — 30 July 2026** (`rubert-tiny2-trained-20260730`). It was evaluated with calibrated thresholds on a leakage-filtered holdout of **75,457** examples.
+The production text-classification release is **ruBERT Tiny2 Moderation — 30 July 2026** (`rubert-tiny2-trained-20260730`). Its current reproducible validation run was executed on **9 August 2026** with the model bundle's saved calibrated thresholds and `data/exports/moderation_dataset_v2/validation.jsonl` (**118,857** examples).
 
 | Metric | Production ruBERT Tiny2 |
 | --- | ---: |
-| Micro-F1 | **0.9736** |
-| Macro-F1 | **0.9246** |
-| Exact match | **0.9605** |
-| GTX 1650 p95, batch=1 | **2.14 ms** |
-| GTX 1650 throughput | **1,671 msg/s** |
-| GTX 1650 peak GPU memory | **497 MB** |
+| Micro-F1 | **0.9690** |
+| Macro-F1 | **0.9132** |
+| Exact match | **0.9480** |
+| Micro-precision | **0.9625** |
+| Micro-recall | **0.9757** |
+| NVIDIA GeForce RTX 4060 Laptop GPU p50, batch=1 | **6.43 ms** |
+| NVIDIA GeForce RTX 4060 Laptop GPU p95, batch=1 | **8.94 ms** |
+| NVIDIA GeForce RTX 4060 Laptop GPU throughput, batch=128 | **1,339 msg/s** |
+| Model bundle size | **791 MiB** |
 
-The quality figures use the calibrated release thresholds. The release report excludes 126 cross-split overlaps from the original test set; it is not a claim of performance on arbitrary live Discord traffic. The detailed evidence is versioned in [`models/rubert_models_comparison_gtx1650_20260730.json`](./models/rubert_models_comparison_gtx1650_20260730.json).
+The quality figures use the calibrated release thresholds already bundled with the 30 July model; they are not re-tuned on this validation set. Within the evaluated split all 118,857 JSONL records parsed successfully, contain a non-empty string and 13 binary labels, and have no duplicate normalized text. This is a validation result rather than a claim of performance on arbitrary live Discord traffic. The complete, versioned evidence is [`docs/reports/rubert_tiny2_validation_20260809.json`](./docs/reports/rubert_tiny2_validation_20260809.json).
 
 The model bundle is deployed separately and is intentionally not committed to this repository. A production host must provide the verified directory referenced by `MUXIVO_CORE_API_RUBERT_MODEL_DIR`; otherwise, a required ruBERT component is unavailable and `/health` is degraded.
 
@@ -33,28 +36,36 @@ The model bundle is deployed separately and is intentionally not committed to th
 - optional media analysis: SSRF-safe Discord CDN downloads, decoded-image validation, hashes, OCR, known-scam hash matching, and an ONNX YOLO provider;
 - Alembic-owned PostgreSQL migrations, deployment utilities, training/curation tools, and load-test modules.
 
-## Release evidence and graphics
+## Current validation evidence and graphics
 
-All graphics below are generated from the 30 July model-selection artefacts. They replace the historical training curves that described a pre-production run and must not be used as production evidence.
+All graphics below are generated from the current 9 August validation report for the deployed 30 July Tiny2 model. They separate model quality, single-message latency, calibration, thresholds, and dataset distribution; hardware-dependent speed figures must be compared only with the stated device and batch size.
 
-![Production model profile](./docs/images/production/tiny2_production_profile_20260730.png)
+![Validation model quality](./docs/images/validation/tiny2_validation_quality_20260809.png)
 
-![Production model quality by label](./docs/images/production/tiny2_per_label_quality_20260730.png)
+![Validation inference speed](./docs/images/validation/tiny2_validation_speed_20260809.png)
 
-![Production threshold calibration](./docs/images/production/tiny2_threshold_calibration_20260730.png)
+![Validation quality by label](./docs/images/validation/tiny2_validation_per_label_quality_20260809.png)
 
-![Production thresholds](./docs/images/production/tiny2_thresholds_20260730.png)
+![Validation threshold calibration](./docs/images/validation/tiny2_validation_threshold_calibration_20260809.png)
 
-![Sensitive-topic quality slices](./docs/images/production/tiny2_topic_slices_20260730.png)
+![Validation thresholds](./docs/images/validation/tiny2_validation_thresholds_20260809.png)
 
-![Label support in the evaluated holdout](./docs/images/production/tiny2_label_support_20260730.png)
+![Validation label support](./docs/images/validation/tiny2_validation_label_support_20260809.png)
 
-![Prediction balance in the evaluated holdout](./docs/images/production/tiny2_prediction_balance_20260730.png)
+![Validation prediction balance](./docs/images/validation/tiny2_validation_prediction_balance_20260809.png)
 
-Regenerate these figures from the checked-in JSON evidence:
+Re-run the validation evidence and regenerate the figures:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\training\build_production_model_report.py
+.\.venv\Scripts\python.exe scripts\training\compare_rubert_models.py `
+  --model tiny2=models/rubert-tiny2-trained-20260730 `
+  --dataset-dir data/exports/moderation_dataset_v2 `
+  --test-path data/exports/moderation_dataset_v2/validation.jsonl `
+  --skip-overlap-filter --batch-size 128 --latency-samples 200 `
+  --output docs/reports/rubert_tiny2_validation_20260809.json
+.\.venv\Scripts\python.exe scripts\training\build_production_model_report.py `
+  --report docs/reports/rubert_tiny2_validation_20260809.json `
+  --output docs/images/validation
 ```
 
 ## Runtime architecture

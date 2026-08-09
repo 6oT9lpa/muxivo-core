@@ -1,0 +1,347 @@
+{
+  "test_path": "E:\\muxivo\\muxivo AI\\data\\exports\\moderation_dataset_v2\\validation.jsonl",
+  "reference_dataset_dir": "E:\\muxivo\\muxivo AI\\data\\exports\\moderation_dataset_v2",
+  "cross_split_overlap_filter_applied": false,
+  "original_test_rows": 118857,
+  "excluded_cross_split_overlaps": 0,
+  "holdout_rows": 118857,
+  "models": {
+    "tiny2": {
+      "model_dir": "E:\\muxivo\\muxivo AI\\models\\rubert-tiny2-trained-20260730",
+      "benchmark": {
+        "device": "cuda",
+        "device_name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+        "batch_size": 128,
+        "rows": 118857,
+        "inference_seconds": 88.74809420004021,
+        "rows_per_second": 1339.2625618764685,
+        "batch_1_latency_samples": 200,
+        "batch_1_latency_mean_ms": 6.727578501740936,
+        "batch_1_latency_p50_ms": 6.428199965739623,
+        "batch_1_latency_p95_ms": 8.935995015781371,
+        "peak_gpu_memory_mb": 4174.03076171875,
+        "model_directory_bytes": 829339088
+      },
+      "quality": {
+        "fixed_0_5": {
+          "thresholds": {
+            "SAFE": 0.5,
+            "SPAM": 0.5,
+            "ADVERTISEMENT": 0.5,
+            "INVITE": 0.5,
+            "SCAM": 0.5,
+            "TOXIC": 0.5,
+            "PROFANITY": 0.5,
+            "POLITICS_IRL": 0.5,
+            "HATE": 0.5,
+            "THREAT": 0.5,
+            "NSFW": 0.5,
+            "EVASION": 0.5,
+            "URL": 0.5
+          },
+          "metrics": {
+            "micro_f1": 0.9581907839662367,
+            "macro_f1": 0.8785032925905794,
+            "micro_precision": 0.9388274329435506,
+            "micro_recall": 0.9783696956403938,
+            "exact_match": 0.9306056858241416,
+            "positive_predictions": 161543,
+            "positive_targets": 155014,
+            "per_label": {
+              "SAFE": {
+                "support": 57706,
+                "predicted_positives": 57061,
+                "precision": 0.9826501463346243,
+                "recall": 0.9716667244307351,
+                "f1": 0.9771275715144597,
+                "false_positives": 990,
+                "false_negatives": 1635,
+                "false_positive_rate": 0.016189432715736456
+              },
+              "SPAM": {
+                "support": 2721,
+                "predicted_positives": 2890,
+                "precision": 0.9134948096885813,
+                "recall": 0.9702315325248071,
+                "f1": 0.941008732846195,
+                "false_positives": 250,
+                "false_negatives": 81,
+                "false_positive_rate": 0.002152648618860646
+              },
+              "ADVERTISEMENT": {
+                "support": 3143,
+                "predicted_positives": 3280,
+                "precision": 0.9463414634146341,
+                "recall": 0.9875914731148584,
+                "f1": 0.9665265452280866,
+                "false_positives": 176,
+                "false_negatives": 39,
+                "false_positive_rate": 0.001520991409855333
+              },
+              "INVITE": {
+                "support": 420,
+                "predicted_positives": 422,
+                "precision": 0.995260663507109,
+                "recall": 1.0,
+                "f1": 0.997624703087886,
+                "false_positives": 2,
+                "false_negatives": 0,
+                "false_positive_rate": 1.6886614824759156e-05
+              },
+              "SCAM": {
+                "support": 563,
+                "predicted_positives": 719,
+                "precision": 0.7301808066759388,
+                "recall": 0.9325044404973357,
+                "f1": 0.8190327613104524,
+                "false_positives": 194,
+                "false_negatives": 38,
+                "false_positive_rate": 0.0016399817404094883
+              },
+              "TOXIC": {
+                "support": 30021,
+                "predicted_positives": 30889,
+                "precision": 0.9509534138366409,
+                "recall": 0.9784484194397255,
+                "f1": 0.9645050073879494,
+                "false_positives": 1515,
+                "false_negatives": 647,
+                "false_positive_rate": 0.01705389706875591
+              },
+              "PROFANITY": {
+                "support": 34391,
+                "predicted_positives": 34875,
+                "precision": 0.9780071684587813,
+                "recall": 0.9917711029048297,
+                "f1": 0.9848410475557994,
+                "false_positives": 767,
+                "false_negatives": 283,
+                "false_positive_rate": 0.009080576800132597
+              },
+              "POLITICS_IRL": {
+                "support": 5006,
+                "predicted_positives": 5233,
+                "precision": 0.9526084463978597,
+                "recall": 0.9958050339592489,
+                "f1": 0.9737279031155386,
+                "false_positives": 248,
+                "false_negatives": 21,
+                "false_positive_rate": 0.0021782856540566178
+              },
+              "HATE": {
+                "support": 2671,
+                "predicted_positives": 4454,
+                "precision": 0.5597215985630893,
+                "recall": 0.9333582927742419,
+                "f1": 0.6997894736842105,
+                "false_positives": 1961,
+                "false_negatives": 178,
+                "false_positive_rate": 0.016878109238634604
+              },
+              "THREAT": {
+                "support": 1177,
+                "predicted_positives": 3018,
+                "precision": 0.35155732273028495,
+                "recall": 0.9014443500424809,
+                "f1": 0.5058402860548272,
+                "false_positives": 1957,
+                "false_negatives": 116,
+                "false_positive_rate": 0.016629843643779743
+              },
+              "NSFW": {
+                "support": 1408,
+                "predicted_positives": 2812,
+                "precision": 0.46088193456614507,
+                "recall": 0.9204545454545454,
+                "f1": 0.614218009478673,
+                "false_positives": 1516,
+                "false_negatives": 112,
+                "false_positive_rate": 0.012907730163730641
+              },
+              "EVASION": {
+                "support": 14288,
+                "predicted_positives": 14377,
+                "precision": 0.9798984489114558,
+                "recall": 0.9860022396416573,
+                "f1": 0.9829408686551544,
+                "false_positives": 289,
+                "false_negatives": 200,
+                "false_positive_rate": 0.002763725387065
+              },
+              "URL": {
+                "support": 1499,
+                "predicted_positives": 1513,
+                "precision": 0.9887640449438202,
+                "recall": 0.9979986657771848,
+                "f1": 0.9933598937583001,
+                "false_positives": 17,
+                "false_negatives": 3,
+                "false_positive_rate": 0.0001448559109732613
+              }
+            }
+          },
+          "topic_slices": {}
+        },
+        "model_calibrated": {
+          "thresholds": {
+            "SAFE": 0.30000001192092896,
+            "SPAM": 0.800000011920929,
+            "ADVERTISEMENT": 0.800000011920929,
+            "INVITE": 0.6000000238418579,
+            "SCAM": 0.800000011920929,
+            "TOXIC": 0.800000011920929,
+            "PROFANITY": 0.75,
+            "POLITICS_IRL": 0.800000011920929,
+            "HATE": 0.800000011920929,
+            "THREAT": 0.800000011920929,
+            "NSFW": 0.800000011920929,
+            "EVASION": 0.800000011920929,
+            "URL": 0.800000011920929
+          },
+          "metrics": {
+            "micro_f1": 0.9690444231588592,
+            "macro_f1": 0.913220375170341,
+            "micro_precision": 0.9624800341090599,
+            "micro_recall": 0.9756989691253694,
+            "exact_match": 0.9479795047830586,
+            "positive_predictions": 157143,
+            "positive_targets": 155014,
+            "per_label": {
+              "SAFE": {
+                "support": 57706,
+                "predicted_positives": 58218,
+                "precision": 0.9752482050225016,
+                "recall": 0.9839011541260874,
+                "f1": 0.9795555708912735,
+                "false_positives": 1441,
+                "false_negatives": 929,
+                "false_positive_rate": 0.02356461873068306
+              },
+              "SPAM": {
+                "support": 2721,
+                "predicted_positives": 2708,
+                "precision": 0.9615952732644018,
+                "recall": 0.9570011025358324,
+                "f1": 0.9592926874194142,
+                "false_positives": 104,
+                "false_negatives": 117,
+                "false_positive_rate": 0.0008955018254460288
+              },
+              "ADVERTISEMENT": {
+                "support": 3143,
+                "predicted_positives": 3189,
+                "precision": 0.9667607400439009,
+                "recall": 0.9809099586382437,
+                "f1": 0.9737839545167404,
+                "false_positives": 106,
+                "false_negatives": 60,
+                "false_positive_rate": 0.0009160516445719619
+              },
+              "INVITE": {
+                "support": 420,
+                "predicted_positives": 421,
+                "precision": 0.997624703087886,
+                "recall": 1.0,
+                "f1": 0.9988109393579072,
+                "false_positives": 1,
+                "false_negatives": 0,
+                "false_positive_rate": 8.443307412379578e-06
+              },
+              "SCAM": {
+                "support": 563,
+                "predicted_positives": 573,
+                "precision": 0.9109947643979057,
+                "recall": 0.9271758436944938,
+                "f1": 0.9190140845070423,
+                "false_positives": 51,
+                "false_negatives": 41,
+                "false_positive_rate": 0.0004311292204169273
+              },
+              "TOXIC": {
+                "support": 30021,
+                "predicted_positives": 29438,
+                "precision": 0.9805353624566886,
+                "recall": 0.9614936211318743,
+                "f1": 0.9709211389360736,
+                "false_positives": 573,
+                "false_negatives": 1156,
+                "false_positive_rate": 0.006450087802242334
+              },
+              "PROFANITY": {
+                "support": 34391,
+                "predicted_positives": 34399,
+                "precision": 0.9867147300793627,
+                "recall": 0.986944258672327,
+                "f1": 0.9868294810292194,
+                "false_positives": 457,
+                "false_negatives": 449,
+                "false_positive_rate": 0.005410461013899083
+              },
+              "POLITICS_IRL": {
+                "support": 5006,
+                "predicted_positives": 5110,
+                "precision": 0.9714285714285714,
+                "recall": 0.9916100679184978,
+                "f1": 0.981415579280348,
+                "false_positives": 146,
+                "false_negatives": 42,
+                "false_positive_rate": 0.00128237784472688
+              },
+              "HATE": {
+                "support": 2671,
+                "predicted_positives": 3535,
+                "precision": 0.6551626591230552,
+                "recall": 0.8670909771621116,
+                "f1": 0.7463744763132453,
+                "false_positives": 1219,
+                "false_negatives": 355,
+                "false_positive_rate": 0.010491797634826916
+              },
+              "THREAT": {
+                "support": 1177,
+                "predicted_positives": 1988,
+                "precision": 0.48993963782696176,
+                "recall": 0.8275276125743416,
+                "f1": 0.6154818325434439,
+                "false_positives": 1014,
+                "false_negatives": 203,
+                "false_positive_rate": 0.008616587355540448
+              },
+              "NSFW": {
+                "support": 1408,
+                "predicted_positives": 1900,
+                "precision": 0.6589473684210526,
+                "recall": 0.8892045454545454,
+                "f1": 0.7569528415961306,
+                "false_positives": 648,
+                "false_negatives": 156,
+                "false_positive_rate": 0.005517288354945551
+              },
+              "EVASION": {
+                "support": 14288,
+                "predicted_positives": 14164,
+                "precision": 0.9907512002259249,
+                "recall": 0.9821528555431132,
+                "f1": 0.9864332911570364,
+                "false_positives": 131,
+                "false_negatives": 255,
+                "false_positive_rate": 0.0012527613346211591
+              },
+              "URL": {
+                "support": 1499,
+                "predicted_positives": 1500,
+                "precision": 0.9966666666666667,
+                "recall": 0.9973315543695798,
+                "f1": 0.9969989996665555,
+                "false_positives": 5,
+                "false_negatives": 4,
+                "false_positive_rate": 4.260467969801803e-05
+              }
+            }
+          },
+          "topic_slices": {}
+        }
+      }
+    }
+  }
+}
