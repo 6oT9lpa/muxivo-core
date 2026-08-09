@@ -1,14 +1,14 @@
 # Privacy Policy for Muxivo Core
 
 **Effective Date:** July 10, 2026  
-**Last Updated:** July 23, 2026
+**Last Updated:** August 08, 2026
 
 This policy explains what data Muxivo Core processes when it is used as a
 local/self-hosted moderation API.
 
 ## 1. Operator
 
-Project operator: **6oT9lpa / Muxivo Core project team**.
+Project operator: **6oT9lpa / Muxivo Dev`s**.
 
 The organization or server administrator deploying Muxivo Core is responsible
 for choosing which platform messages are sent to the API and for informing users
