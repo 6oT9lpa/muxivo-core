@@ -1,5 +1,7 @@
 from datetime import datetime, timezone
 from io import BytesIO
+from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 from PIL import Image
@@ -13,6 +15,7 @@ from src.domain.media.media_runtime_config import MediaRuntimeConfig
 from src.domain.media.ocr_result import OcrResult
 from src.infrastructure.media.pillow_media_hasher import PillowMediaHasher
 from src.infrastructure.media.pillow_media_validator import PillowMediaValidator
+from src.infrastructure.media.yaml_media_policy_defaults_provider import YamlMediaPolicyDefaultsProvider
 
 
 def _png() -> bytes:
@@ -63,7 +66,11 @@ class _Image:
     enabled = False
     ready = False
 
+    def __init__(self) -> None:
+        self.calls = 0
+
     async def analyze(self, input_image):
+        self.calls += 1
         return ImageDetectionResult(
             attachment_id=input_image.attachment_id,
             model_name="disabled",
@@ -80,7 +87,7 @@ class _Moderation:
     def __init__(self) -> None:
         self.calls = 0
 
-    async def moderate_media(self, request, bundle, correlation_id):
+    async def moderate_media(self, request, bundle, correlation_id, **_kwargs):
         self.calls += 1
         labels = {analysis.attachment.attachment_id: ("SCAM",) for analysis in bundle.attachments}
         return (
@@ -140,6 +147,39 @@ def _request() -> MediaModerationRequestSchema:
             ),
         }
     )
+
+
+def test_media_request_excludes_discord_attachment_transport_url_from_text_classifiers() -> None:
+    request = _request().model_copy(
+        update={
+            "message": _request().message.model_copy(
+                update={
+                    "raw_text": (
+                        "caption https://media.discordapp.net/a.png?width=480 "
+                        "https://example.com/keep"
+                    )
+                }
+            )
+        }
+    )
+
+    sanitized = MediaModerationService._without_attachment_transport_urls(request)
+
+    assert sanitized.message.raw_text == "caption  https://example.com/keep"
+
+
+def test_media_request_keeps_unrelated_text_url() -> None:
+    request = _request().model_copy(
+        update={
+            "message": _request().message.model_copy(
+                update={"raw_text": "https://example.com/not-an-attachment"}
+            )
+        }
+    )
+
+    sanitized = MediaModerationService._without_attachment_transport_urls(request)
+
+    assert sanitized.message.raw_text == "https://example.com/not-an-attachment"
 
 
 @pytest.mark.asyncio
@@ -207,3 +247,50 @@ async def test_media_service_produces_one_decision_and_deduplicates_exact_image(
     assert response.attachments[1].status.value == "duplicate"
     assert len(attachments.records) == 2
     assert all(record.redacted_ocr_text == "casino fake win" for record in attachments.records)
+
+
+@pytest.mark.asyncio
+async def test_ocr_only_runtime_skips_yolo_even_if_a_saved_policy_still_enables_it() -> None:
+    defaults = YamlMediaPolicyDefaultsProvider(
+        ocr_path=Path("configs/policies/ocr_rules.yaml"),
+        yolo_path=Path("configs/policies/yolo_rules.yaml"),
+    ).get_defaults()
+    stale_policy = defaults.model_copy(
+        update={
+            "yolo": defaults.yolo.model_copy(
+                update={"yolo": defaults.yolo.yolo.model_copy(update={"enabled": True})}
+            )
+        }
+    )
+
+    class _PolicyResolver:
+        async def resolve(self, _platform, _guild_id):
+            return SimpleNamespace(media=stale_policy)
+
+    moderation = _Moderation()
+    image = _Image()
+    service = MediaModerationService(
+        moderation_service=moderation,
+        downloader=_Downloader(),
+        validator=PillowMediaValidator(
+            allowed_content_types=("image/png",), max_width=100, max_height=100, max_pixels=10_000
+        ),
+        hasher=PillowMediaHasher(),
+        ocr_provider=_Ocr(),
+        image_provider=image,
+        attachment_repository=_Repository(),
+        analysis_repository=_Repository(),
+        runtime_config=MediaRuntimeConfig(
+            enabled=True, required=False, max_attachments=4, max_file_size_bytes=1_000_000,
+            max_total_size_bytes=2_000_000, max_width=100, max_height=100, max_pixels=10_000,
+            retention_hours=24, hash_cache_ttl_hours=24, input_version="v1", ocr_required=False,
+            image_required=False,
+        ),
+        media_policy_resolver=_PolicyResolver(),
+    )
+
+    response = await service.moderate(_request(), "correlation")
+
+    assert moderation.calls == 1
+    assert image.calls == 0
+    assert "image_provider_disabled" not in response.attachments[0].warnings

@@ -43,7 +43,15 @@ class ApiSettings(BaseSettings):
     media_max_redirects: int = Field(default=2, ge=0, le=5)
     media_proxy_url: str | None = Field(default=None, max_length=2_048)
     media_allowed_content_types: tuple[str, ...] = ("image/gif", "image/jpeg", "image/png", "image/webp")
-    media_allowed_download_hosts: tuple[str, ...] = ("cdn.discordapp.com", "media.discordapp.net")
+    # Discord GIF-picker embeds point to the actual GIF bytes on Tenor's CDN.
+    # This remains an explicit SSRF allow-list; the API never follows arbitrary
+    # external embed or provider URLs.
+    media_allowed_download_hosts: tuple[str, ...] = (
+        "cdn.discordapp.com",
+        "media.discordapp.net",
+        "media.tenor.com",
+        "c.tenor.com",
+    )
     media_retention_hours: int = Field(default=24, ge=1, le=720)
     media_hash_cache_ttl: int = Field(default=24, ge=1, le=720)
     media_input_version: str = Field(default="media-v1", min_length=1, max_length=128)

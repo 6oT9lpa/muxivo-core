@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import re
 from datetime import datetime, timedelta, timezone
+from html import unescape
+from urllib.parse import urlsplit
 
 from src.application.api_moderation_service import ApiModerationService
 from src.application.effective_media_policy_resolver import EffectiveMediaPolicyResolver
@@ -52,6 +55,8 @@ logger = get_logger(__name__)
 
 
 class MediaModerationService:
+    _HTTPS_URL = re.compile(r"https://[^\s<>\[\]()+]+", re.IGNORECASE)
+    _DISCORD_MEDIA_HOSTS = frozenset({"cdn.discordapp.com", "media.discordapp.net"})
     def __init__(
         self,
         *,
@@ -87,6 +92,12 @@ class MediaModerationService:
         correlation_id: str,
     ) -> MediaModerationResponseSchema:
         self._validate_request_limits(request)
+        # A Discord GIF picker represents its file both as an attachment input
+        # and as a signed CDN URL in message.raw_text.  The latter is transport
+        # metadata, not user-authored text: sending it to preprocessing or
+        # ruBERT causes false URL/EVASION signals.  Keep the URL only in the
+        # attachment pipeline, while preserving captions and unrelated links.
+        request = self._without_attachment_transport_urls(request)
         effective_policy = None
         if self._media_policy_resolver is not None:
             try:
@@ -230,6 +241,41 @@ class MediaModerationService:
         if len(request.attachments) > self._runtime_config.max_attachments:
             raise MediaValidationError("too many media attachments")
 
+    @classmethod
+    def _without_attachment_transport_urls(
+        cls,
+        request: MediaModerationRequestSchema,
+    ) -> MediaModerationRequestSchema:
+        media_resources = {
+            cls._media_resource_identity(attachment.download_url)
+            for attachment in request.attachments
+            if attachment.download_url
+        }
+        if not media_resources:
+            return request
+
+        def remove_transport_url(match: re.Match[str]) -> str:
+            value = match.group(0)
+            url = value.rstrip(".,!?:;\")]}>" )
+            return "" if cls._media_resource_identity(url) in media_resources else value
+
+        raw_text = request.message.raw_text
+        sanitized = cls._HTTPS_URL.sub(remove_transport_url, raw_text).replace("<>", "").strip()
+        if sanitized == raw_text:
+            return request
+        return request.model_copy(
+            update={"message": request.message.model_copy(update={"raw_text": sanitized})}
+        )
+
+    @classmethod
+    def _media_resource_identity(cls, url: str) -> str:
+        canonical = unescape(str(url))
+        parsed = urlsplit(canonical)
+        host = (parsed.hostname or "").casefold()
+        if host in cls._DISCORD_MEDIA_HOSTS:
+            return f"discord:{parsed.path}"
+        return canonical
+
     async def _ingest_attachment(
         self,
         attachment: MediaAttachment,
@@ -341,10 +387,12 @@ class MediaModerationService:
             warnings.append("ocr_unavailable" if ocr_enabled else "ocr_disabled")
 
         image_result = None
-        yolo_enabled = (
-            yolo_policy.enabled
-            if yolo_policy is not None
-            else self._image_provider.enabled
+        # A per-guild policy may only narrow the available runtime features.  In
+        # particular, a previously saved policy with YOLO enabled must never
+        # invoke the disabled provider (or turn its absence into a media
+        # failure) on an OCR-only installation.
+        yolo_enabled = self._image_provider.enabled and (
+            yolo_policy.enabled if yolo_policy is not None else True
         )
         yolo_required = (
             yolo_policy.required
@@ -368,9 +416,9 @@ class MediaModerationService:
                         attachment, MediaAttachmentStatus.UNAVAILABLE, exc
                     )
                 warnings.append(exc.code)
-        else:
+        elif self._image_provider.enabled:
             warnings.append("image_provider_disabled")
-        if yolo_required and not self._image_provider.ready:
+        if yolo_enabled and yolo_required and not self._image_provider.ready:
             return self._failed_analysis(
                 attachment,
                 MediaAttachmentStatus.UNAVAILABLE,

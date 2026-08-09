@@ -1,6 +1,7 @@
 version: "yolo-policy-v1"
 yolo:
-  enabled: true
+  # YOLO is an optional detector. OCR-only installations must never invoke it.
+  enabled: false
   required: false
   allow_partial_results: true
   inference:
